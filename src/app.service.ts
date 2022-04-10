@@ -5,7 +5,7 @@ export class AppService {
   getHello(): string {
     return `
       <div style="text-align:center">
-        <h1>Hello World!</h1>
+        <h1>Hello Mayis!</h1>
         <h2>NestJS &lt; &gt; Azure Functions</h2>
         <br><br><br><br><br>
         Made with love by
