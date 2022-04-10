@@ -15,7 +15,7 @@ export class TasksService {
   }
 
   createTask(createTaskDto: CreateTaskDto): Task {
-    const newTask: Task = {id: this.tasks.length + 1, ...createTaskDto};
+    const newTask: Task = {id: this.tasks.length + 1, name: createTaskDto.name};
     this.tasks.push(newTask);
     return newTask;
   }
