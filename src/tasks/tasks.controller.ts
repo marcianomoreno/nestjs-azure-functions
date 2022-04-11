@@ -1,4 +1,4 @@
-import { Body, Controller, Get, ImATeapotException, NotFoundException, Param, ParseIntPipe, Post, Query } from '@nestjs/common';
+import { Body, Controller, Delete, Get, ImATeapotException, NotFoundException, Param, ParseIntPipe, Patch, Post, Query } from '@nestjs/common';
 import { CreateTaskDto } from './dto/create-task.dto';
 import { Task } from './entities/task.entity';
 import { TasksService } from './tasks.service';
@@ -17,7 +17,7 @@ export class TasksController {
   }
 
   @Post()
-  createTask(@Body() body: CreateTaskDto ): Task {
+  createTask(@Body() body: CreateTaskDto): Task {
     console.log("createTask", body);
     return this.tasksService.createTask(body);
   }
@@ -34,5 +34,15 @@ export class TasksController {
       console.log(e);
       throw new ImATeapotException(e);
     }
+  }
+
+  @Patch(':id')
+  updateTaskById(@Param('id', ParseIntPipe) id: number, @Body() body: Partial<CreateTaskDto>): Task {
+    return this.tasksService.updateTaskById(id, body);
+  }
+
+  @Delete(':id')
+  deleteTaskById(@Param('id', ParseIntPipe) id: number): Task {
+    return this.tasksService.deleteTaskById(id);
   }
 }
