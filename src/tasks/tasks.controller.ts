@@ -1,4 +1,4 @@
-import { Body, Controller, Get, NotFoundException, Param, ParseIntPipe, Post, Query } from '@nestjs/common';
+import { Body, Controller, Get, ImATeapotException, NotFoundException, Param, ParseIntPipe, Post, Query } from '@nestjs/common';
 import { CreateTaskDto } from './dto/create-task.dto';
 import { Task } from './entities/task.entity';
 import { TasksService } from './tasks.service';
@@ -24,10 +24,15 @@ export class TasksController {
 
   @Get(':id')
   getTaskById(@Param('id', ParseIntPipe) id: number): Task {
-    const task = this.tasksService.getTaskById(id);
-    if (!task) {
-      throw new NotFoundException(`Task with id ${id} not found`);
+    try {
+      const task = this.tasksService.getTaskById(id);
+      if (!task) {
+        throw new NotFoundException(`Task with id ${id} not found`);
+      }
+      return task;
+    } catch (e) {
+      console.log(e);
+      throw new ImATeapotException(e);
     }
-    return task;
   }
 }
