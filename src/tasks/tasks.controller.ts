@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Param, Post, Query } from '@nestjs/common';
+import { Body, Controller, Get, NotFoundException, Param, ParseIntPipe, Post, Query } from '@nestjs/common';
 import { CreateTaskDto } from './dto/create-task.dto';
 import { Task } from './entities/task.entity';
 import { TasksService } from './tasks.service';
@@ -20,5 +20,14 @@ export class TasksController {
   createTask(@Body() body: CreateTaskDto ): Task {
     console.log("createTask", body);
     return this.tasksService.createTask(body);
+  }
+
+  @Get(':id')
+  getTaskById(@Param('id', ParseIntPipe) id: number): Task {
+    const task = this.tasksService.getTaskById(id);
+    if (!task) {
+      throw new NotFoundException(`Task with id ${id} not found`);
+    }
+    return task;
   }
 }
