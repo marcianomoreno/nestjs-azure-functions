@@ -1,4 +1,8 @@
+import { EntityInt32, EntityPartitionKey, EntityRowKey, EntityString } from '@nestjs/azure-database';
+
+@EntityPartitionKey('TaskId')
+@EntityRowKey('TaskName')
 export class Task {
-  id: number;
-  name: string;
+  @EntityInt32() id: number;
+  @EntityString() name: string;
 }
