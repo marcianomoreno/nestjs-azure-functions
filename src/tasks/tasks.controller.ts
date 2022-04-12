@@ -1,4 +1,4 @@
-import { Body, Controller, Delete, Get, ImATeapotException, NotFoundException, Param, ParseIntPipe, Patch, Post, Query } from '@nestjs/common';
+import { Body, Controller, Delete, Get, ImATeapotException, NotFoundException, Param, ParseIntPipe, Patch, Post, Query, UnprocessableEntityException } from '@nestjs/common';
 import { CreateTaskDto } from './dto/create-task.dto';
 import { Task } from './entities/task.entity';
 import { TasksService } from './tasks.service';
@@ -12,14 +12,30 @@ export class TasksController {
   }
 
   @Get()
-  getTasks(): Task[] {
-    return this.tasksService.getTasks();
+  async getTasks() {
+    return await this.tasksService.getTasks();
   }
 
   @Post()
-  createTask(@Body() body: CreateTaskDto): Task {
-    console.log("createTask", body);
-    return this.tasksService.createTask(body);
+  async createTask(
+    @Body() 
+    createTaskDto: CreateTaskDto) {
+      try {
+        const task = new Task();
+        Object.assign(task, createTaskDto);
+        return await this.tasksService.createTask(task);
+      } catch (error) {
+        throw new UnprocessableEntityException(error);
+      }
+  }
+
+  @Get(':rowKey')
+  async getTaskByRowKey(@Param('rowKey') rowKey: string) {
+    try {
+      return await this.tasksService.findTaskByRowKey(rowKey, new Task());
+    } catch (error) {
+      throw new NotFoundException(error);
+    }
   }
 
   @Get(':id')
@@ -33,6 +49,21 @@ export class TasksController {
     } catch (e) {
       console.log(e);
       throw new ImATeapotException(e);
+    }
+  }
+
+  @Patch(':rowKey')
+  async updateTaskByRowKey(
+    @Param('rowKey') rowKey: string,
+    @Body() taskData: Partial<CreateTaskDto>
+  )
+  {
+    try {
+      const task = new Task();
+      Object.assign(task, taskData);
+      return await this.tasksService.updateTaskByRowKey(rowKey, task);
+    } catch (error) {
+      throw new UnprocessableEntityException(error);
     }
   }
 

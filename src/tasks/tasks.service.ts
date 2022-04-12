@@ -1,27 +1,37 @@
+import { AzureTableStorageResultList, InjectRepository, Repository } from '@nestjs/azure-database';
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { CreateTaskDto } from './dto/create-task.dto';
 import { Task } from './entities/task.entity';
 
 @Injectable()
 export class TasksService {
+  constructor(
+    @InjectRepository(Task) private readonly tasksRepository: Repository<Task>,
+  ) {}
   private tasks: Task[] = [ { id:1, name: 'Task 1' }, { id:2, name: 'Task 2' }, {id: 3, name: 'Task 3' } ];
 
   getHello(): string {
     return "Hello tasks!";
   }
 
-  getTasks(): Task[] {
-    return this.tasks;
+  async getTasks(): Promise<AzureTableStorageResultList<Task>> {
+    return this.tasksRepository.findAll();
   }
 
-  createTask(createTaskDto: CreateTaskDto): Task {
-    const newTask: Task = {id: this.tasks.length + 1, name: createTaskDto.name};
-    this.tasks.push(newTask);
-    return newTask;
+  async createTask(task: Task): Promise<Task> {
+    return this.tasksRepository.create(task);
+  }
+
+  async findTaskByRowKey(rowKey: string, task: Task):Promise<Task> {
+    return this.tasksRepository.find(rowKey, task);
   }
 
   getTaskById(id: number): Task {
     return this.tasks.find(task => task.id === id);
+  }
+
+  async updateTaskByRowKey(rowKey: string, task: Partial<Task>): Promise<Task> {
+    return this.tasksRepository.update(rowKey, task)
   }
 
   updateTaskById(id: number, createTaskDto: Partial<CreateTaskDto>): Task {
